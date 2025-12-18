@@ -3,9 +3,9 @@ services:
     name: mafadzatechsolution
     env: python
     plan: free
-    region: ohio  # or your region
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    region: ohio
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     pythonVersion: "3.12.9"
     envVars:
       - key: SECRET_KEY
