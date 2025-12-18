@@ -1,0 +1,20 @@
+# Production Requirements
+# Core Dependencies
+Flask==3.0.0
+Werkzeug==3.0.1
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+python-dotenv==1.0.0
+
+# Production Server (choose one)
+gunicorn==21.2.0  # For Render, Heroku, etc.
+# waitress==2.1.2  # For Windows servers
+
+# Database (if using PostgreSQL)
+# psycopg2-binary==2.9.9
+
+# Email (optional)
+# Flask-Mail==0.9.1
+
+# Security
+# bcrypt==4.0.1  # For stronger password hashing

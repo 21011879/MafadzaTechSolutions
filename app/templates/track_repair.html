@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Track Repair - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Tracking Form -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-search"></i> Track Your Repair</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.track_repair') }}">
+                        <div class="mb-4">
+                            <label for="tracking_id" class="form-label">Enter Your Tracking ID</label>
+                            <input type="text" class="form-control" id="tracking_id" name="tracking_id" 
+                                   placeholder="e.g., MFZ202412250001" required 
+                                   value="{{ request.form.get('tracking_id', '') }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Track Repair</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results -->
+            {% if repair %}
+            <div class="card shadow border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Repair Status</h4>
+                </div>
+                <div class="card-body">
+                    <h5>Tracking ID: {{ repair.tracking_id }}</h5>
+                    <p>Status: <span class="badge bg-primary">{{ repair.status }}</span></p>
+                    <p>Device: {{ repair.device_type }} - {{ repair.brand }} {{ repair.model }}</p>
+                    
+                    <div class="progress mb-3">
+                        <!-- Simple fixed progress bar without calculations -->
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: 50%;"
+                             aria-valuenow="60" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            50% Complete
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        For detailed tracking information, please contact us at {{ config.BUSINESS_INFO.phone }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

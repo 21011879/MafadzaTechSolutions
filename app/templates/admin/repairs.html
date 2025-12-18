@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Repairs - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-list"></i> All Repairs
+        </h1>
+        <div>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter"></i> Filters
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Status Filter</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+                        {% for status in config.STATUS_OPTIONS %}
+                        <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Search (Tracking ID, Model, Brand)</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search..." value="{{ request.args.get('search', '') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Repairs Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Repair Orders ({{ repairs|length }})
+            </h6>
+            <div>
+                <span class="badge bg-primary">Total: {{ repairs|length }}</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Tracking ID</th>
+                            <th>Customer</th>
+                            <th>Device Info</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for repair in repairs %}
+                        <tr>
+                            <td>
+                                <strong>{{ repair.tracking_id }}</strong>
+                                {% if repair.is_paid %}
+                                    <span class="badge bg-success" title="Paid">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if repair.customer %}
+                                    {{ repair.customer.name }}<br>
+                                    <small class="text-muted">{{ repair.customer.phone }}</small>
+                                {% else %}
+                                    <span class="text-muted">No customer data</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ repair.device_type }}<br>
+                                <strong>{{ repair.brand }} {{ repair.model }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ repair.get_status_color() }}">
+                                    {{ repair.status }}
+                                </span>
+                            </td>
+                            <td>{{ repair.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if repair.actual_cost > 0 %}
+                                    <strong>R{{ "%.2f"|format(repair.actual_cost) }}</strong>
+                                {% elif repair.estimated_cost > 0 %}
+                                    <em class="text-muted">Est: R{{ "%.2f"|format(repair.estimated_cost) }}</em>
+                                {% else %}
+                                    <span class="text-muted">Not set</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin.repair_detail', repair_id=repair.id) }}" 
+                                       class="btn btn-sm btn-primary" title="View/Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('main.track_repair') }}?tracking_id={{ repair.tracking_id }}" 
+                                       class="btn btn-sm btn-info" title="Track" target="_blank">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-inbox fa-2x text-muted mb-3"></i><br>
+                                No repairs found
+                                {% if status_filter != 'all' %}
+                                    with status "{{ status_filter }}"
+                                {% endif %}
+                                <br>
+                                <a href="{{ url_for('main.book_repair') }}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Create New Repair
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <small class="text-muted">
+                Showing {{ repairs|length }} repair order(s)
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

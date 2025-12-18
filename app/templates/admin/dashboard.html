@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - {{ super() }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.7;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+    }
+    
+    .quick-action-btn {
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    .quick-action-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    .quick-action-icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </h1>
+        <div class="text-muted">
+            Welcome, {{ current_user.username }} | {{ now.strftime('%Y-%m-%d %H:%M') }}
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Repairs
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tools fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.completed }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                In Progress
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.in_progress }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-sync-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Revenue
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">R{{ "%.2f"|format(stats.revenue) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <span class="fa-2x text-gray-300" style="font-weight: bold;">R</span>
+         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Distribution -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-pie"></i> Repair Status Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for status, count in status_counts.items() %}
+                                <tr>
+                                    <td>
+                                        {% if status == 'Received' %}
+                                            <span class="badge bg-primary">{{ status }}</span>
+                                        {% elif status == 'Diagnosing' %}
+                                            <span class="badge bg-info">{{ status }}</span>
+                                        {% elif status == 'Waiting for Parts' %}
+                                            <span class="badge bg-warning">{{ status }}</span>
+                                        {% elif status == 'Repairing' %}
+                                            <span class="badge bg-secondary">{{ status }}</span>
+                                        {% elif status == 'Testing' %}
+                                            <span class="badge bg-info">{{ status }}</span>
+                                        {% elif status == 'Completed' %}
+                                            <span class="badge bg-success">{{ status }}</span>
+                                        {% elif status == 'Ready for Pickup' %}
+                                            <span class="badge bg-success">{{ status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ count }}</td>
+                                    <td>
+                                        {% if stats.total > 0 %}
+                                            {{ "%.1f"|format((count / stats.total) * 100) }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list"></i> Recent Repairs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tracking ID</th>
+                                    <th>Device</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repair in repairs %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('admin.repair_detail', repair_id=repair.id) }}" 
+                                           class="text-decoration-none">
+                                            <strong>{{ repair.tracking_id }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>{{ repair.device_type }} - {{ repair.brand }} {{ repair.model }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ repair.get_status_color() }}">
+                                            {{ repair.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ repair.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.repairs') }}" class="btn btn-primary w-100 quick-action-btn text-white">
+                                <i class="fas fa-list quick-action-icon"></i>
+                                <span>All Repairs</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('main.book_repair') }}" class="btn btn-success w-100 quick-action-btn text-white">
+                                <i class="fas fa-plus-circle quick-action-icon"></i>
+                                <span>New Booking</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.repairs') }}?status=Waiting for Parts" class="btn btn-warning w-100 quick-action-btn text-white">
+                                <i class="fas fa-clock quick-action-icon"></i>
+                                <span>Waiting Parts</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.reports') }}" class="btn btn-info w-100 quick-action-btn text-white">
+                                <i class="fas fa-chart-bar quick-action-icon"></i>
+                                <span>Reports</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Urgent Attention -->
+    {% set waiting_parts = status_counts.get('Waiting for Parts', 0) %}
+    {% if waiting_parts > 0 %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow border-left-warning">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Urgent Attention Needed
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-clock fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">{{ waiting_parts }} Repairs Waiting for Parts</h5>
+                                <p class="mb-0">These repairs need immediate attention. Click below to view and update them.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('admin.repairs') }}?status=Waiting for Parts" class="btn btn-warning">
+                        <i class="fas fa-eye me-2"></i> View Waiting Parts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Simple hover effect for quick action buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+        
+        quickActionBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

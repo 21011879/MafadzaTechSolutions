@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Book Repair - {{ super() }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .required:after {
+        content: " *";
+        color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-calendar-plus"></i> Book Device Repair</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.book_repair') }}">
+                        <!-- Customer Information -->
+                        <fieldset class="mb-4">
+                            <legend class="h5 text-primary border-bottom pb-2">
+                                <i class="fas fa-user"></i> Customer Information
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label required">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label required">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Device Information -->
+                        <fieldset class="mb-4">
+                            <legend class="h5 text-primary border-bottom pb-2">
+                                <i class="fas fa-laptop"></i> Device Information
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="device_type" class="form-label required">Device Type</label>
+                                    <select class="form-select" id="device_type" name="device_type" required onchange="updateBrands()">
+                                        <option value="">Select Device Type</option>
+                                        {% for device in config.DEVICE_TYPES %}
+                                            <option value="{{ device }}">{{ device }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="brand" class="form-label required">Brand</label>
+                                    <select class="form-select" id="brand" name="brand" required>
+                                        <option value="">Select Brand</option>
+                                        <!-- Brands will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="model" class="form-label required">Model</label>
+                                    <input type="text" class="form-control" id="model" name="model" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="serial_number" class="form-label">Serial Number (Optional)</label>
+                                    <input type="text" class="form-control" id="serial_number" name="serial_number">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Problem Description -->
+                        <fieldset class="mb-4">
+                            <legend class="h5 text-primary border-bottom pb-2">
+                                <i class="fas fa-exclamation-triangle"></i> Problem Description
+                            </legend>
+                            <div class="mb-3">
+                                <label for="problem" class="form-label required">Describe the problem in detail</label>
+                                <textarea class="form-control" id="problem" name="problem" rows="4" required 
+                                          placeholder="Please describe what's wrong with your device, when it started, and any error messages you see..."></textarea>
+                            </div>
+                        </fieldset>
+
+                        <!-- Deposit Payment (Optional) -->
+                        <fieldset class="mb-4">
+                            <legend class="h5 text-primary border-bottom pb-2">
+                                <i class="fas fa-money-bill-wave"></i> Deposit Payment (Optional)
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="deposit" class="form-label">Deposit Amount ($)</label>
+                                    <input type="number" class="form-control" id="deposit" name="deposit" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="payment_method" class="form-label">Payment Method</label>
+                                    <select class="form-select" id="payment_method" name="payment_method">
+                                        <option value="Cash">Cash</option>
+                                        <option value="Ecocash">Ecocash</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="payment_reference" class="form-label">Payment Reference</label>
+                                    <input type="text" class="form-control" id="payment_reference" name="payment_reference">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Terms and Submit -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Important:</strong> After booking, you'll receive a tracking ID to monitor your repair status. 
+                            We'll contact you within 24 hours for diagnosis confirmation.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Submit Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Brand data - use hardcoded values to avoid template issues
+    const brandData = {
+        'Phone': ['Apple', 'Samsung', 'Google', 'Huawei', 'Xiaomi', 'Other'],
+        'Laptop': ['Dell', 'HP', 'Lenovo', 'Apple', 'Asus', 'Acer', 'Other'],
+        'Tablet': ['Apple', 'Samsung', 'Huawei', 'Lenovo', 'Other'],
+        'Desktop': ['Dell', 'HP', 'Lenovo', 'Apple', 'Acer', 'Other'],
+        'Other': ['Apple', 'Samsung', 'Dell', 'HP', 'Lenovo', 'Other']
+    };
+
+    function updateBrands() {
+        const deviceType = document.getElementById('device_type').value;
+        const brandSelect = document.getElementById('brand');
+        
+        // Clear existing options
+        brandSelect.innerHTML = '<option value="">Select Brand</option>';
+        
+        if (deviceType && brandData[deviceType]) {
+            brandData[deviceType].forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand;
+                option.textContent = brand;
+                brandSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Initialize brands on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateBrands();
+    });
+</script>
+{% endblock %}
