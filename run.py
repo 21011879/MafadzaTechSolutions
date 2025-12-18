@@ -10,6 +10,29 @@ from datetime import datetime
 # Create Flask application
 app = create_app()
 
+@app.route('/create-admin')
+def create_admin():
+    from werkzeug.security import generate_password_hash
+    from app import db, User
+    
+    # Check if admin exists
+    admin = User.query.filter_by(username='admin').first()
+    if admin:
+        return "Admin already exists"
+    
+    # Create new admin
+    new_admin = User(
+        username='DIGIMARK',
+        email='mafadza200@mail.com',
+        is_admin=True
+    )
+    new_admin.set_password('Khalifonia@21!')  # CHANGE THIS!
+    
+    db.session.add(new_admin)
+    db.session.commit()
+    
+    return "✅ Admin created! Username: admin, Password: NewAdminPassword123!"
+
 
 if __name__ == '__main__':
     # Run the application
