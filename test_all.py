@@ -6,7 +6,7 @@ import sys
 DATABASE_URL = "postgresql://mafadza:0wwwJZXRIUN15eXDUm3ls1N9JdR0wpF4@dpg-d51vkueuk2gs73a5s45g-a.oregon-postgres.render.com/mafadzatech_db"  # Replace with your actual URL
 
 # Parse the URL
-url = urlparse(DATABASE_URL)
+url = urlparse(postgresql://mafadza:0wwwJZXRIUN15eXDUm3ls1N9JdR0wpF4@dpg-d51vkueuk2gs73a5s45g-a/mafadzatech_db)
 
 # Connect to database
 conn = psycopg2.connect(
